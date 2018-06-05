@@ -67,20 +67,64 @@ def metadata(sample):
     sample_metadata = {}
 
     # Grab metadata from table
-    database = session.query(Samples_Metadata)
+    results = session.query(Samples_Metadata)
 
     # Loop through query & grab data
-    for data in database:
-        if (sample_id == data.SAMPLEID):
-            sample_metadata["AGE"] = data.AGE
-            sample_metadata["BBTYPE"] = data.BBTYPE
-            sample_metadata["ETHNICITY"] = data.ETHNICITY
-            sample_metadata["GENDER"] = data.GENDER
-            sample_metadata["LOCATION"] = data.LOCATION
-            sample_metadata["SAMPLEID"] = data.SAMPLEID
+    for result in results:
+        if (sample_id == result.SAMPLEID):
+            sample_metadata["AGE"] = result.AGE
+            sample_metadata["BBTYPE"] = result.BBTYPE
+            sample_metadata["ETHNICITY"] = result.ETHNICITY
+            sample_metadata["GENDER"] = result.GENDER
+            sample_metadata["LOCATION"] = result.LOCATION
+            sample_metadata["SAMPLEID"] = result.SAMPLEID
 
     return jsonify(sample_metadata)
 
+# Return an integer value for the weekly washing frequency 'WFREQ'
+@app.route("/wfreq/<sample>")
+def wfreq(sample):
+
+    # Grab input
+    sample_id = sample.replace("BB_", "")
+
+    # Grab metadata from table
+    results = session.query(Samples_Metadata)
+
+    # Loop through query & grab data
+    for result in results:
+        if (sample_id == result.SAMPLEID):
+            wfreq = result.WFREQ
+        
+    return jsonify(wfreq)
+
+# Return a list of dictionaries containing sorted lists for "out_ids" and "sample_values"
+@app.route("/samples/<sample>")
+def samples(sample):
+
+    # Create variable for sample to query for
+    sample_query = "Sample." + sample
+
+    # Create empty dictionary and lists to store data
+    samples_info = {}
+    otu_ids = []
+    sample_values = []
+
+    # Grab metadata from table
+    results = session.query(Samples.otu_id, sample_query).order_by(desc(sample_query))
+
+    # Loop through query and append results to specific lists
+    for result in results:
+        otu_ids.append(result[0])
+        sample_values.append(result[1])
+    
+    # Add lists to dictionary
+    samples_info = {
+        "otu_ids": otu_ids,
+        "sample_values": sample_values
+    }
+
+    return jsonify(samples_info)
 
 
 
