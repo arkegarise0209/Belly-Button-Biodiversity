@@ -4,7 +4,7 @@ from sqlalchemy.ext.automap import automap_base
 from sqlalchemy.orm import Session
 from sqlalchemy import create_engine, desc
 from flask import Flask, jsonify, render_template
-
+import json
 # Create App
 app = Flask(__name__)
 
@@ -23,6 +23,18 @@ Samples_Metadata = Base.classes.samples_metadata
 @app.route("/")
 def home():
     return render_template("index.html")
+
+@app.route("/table_of_contents")
+def contents():
+    routes = [
+        "/names",
+        "/otu",
+        "/metadata/<sample>",
+        "/wfreq/<sample>",
+        "/samples/<sample>"
+        ]
+    
+    return jsonify(routes)
 
 # Return a list of sample names
 @app.route("/names")
@@ -63,21 +75,29 @@ def metadata(sample):
     # Grab input
     sample_id = sample.replace("BB_", "")
 
-    # Empty dictionary for data
-    sample_metadata = {}
-
     # Grab metadata from table
-    results = session.query(Samples_Metadata)
+    results = session.query(Samples_Metadata).filter(Samples_Metadata.SAMPLEID == sample_id)
+   
+    # Create empty list to hold dictionary
+    jsonToReturn = []
 
-    # Loop through query & grab data
+    # Loop through query and grab data
     for result in results:
-        if (sample_id == result.SAMPLEID):
-            sample_metadata["AGE"] = result.AGE
-            sample_metadata["BBTYPE"] = result.BBTYPE
-            sample_metadata["ETHNICITY"] = result.ETHNICITY
-            sample_metadata["GENDER"] = result.GENDER
-            sample_metadata["LOCATION"] = result.LOCATION
-            sample_metadata["SAMPLEID"] = result.SAMPLEID
+        
+        # Create empty dictionary to store data
+        sample_metadata = {}
+
+        # Set variable in dictionary for each set of data retrieved
+        sample_metadata["AGE"] = result.AGE
+        sample_metadata["BBTYPE"] = result.BBTYPE
+        sample_metadata["ETHNICITY"] = result.ETHNICITY
+        sample_metadata["GENDER"] = result.GENDER
+        sample_metadata["LOCATION"] = result.LOCATION
+        sample_metadata["samples_metadata"] = result.SAMPLEID
+
+        # Append dictionary to empty list
+        jsonToReturn.append(sample_metadata)
+    
 
     return jsonify(sample_metadata)
 
@@ -89,12 +109,11 @@ def wfreq(sample):
     sample_id = sample.replace("BB_", "")
 
     # Grab metadata from table
-    results = session.query(Samples_Metadata)
+    results = session.query(Samples_Metadata).filter(Samples_Metadata.SAMPLEID == sample_id)
 
     # Loop through query & grab data
     for result in results:
-        if (sample_id == result.SAMPLEID):
-            wfreq = result.WFREQ
+        wfreq = result.WFREQ
         
     return jsonify(wfreq)
 
@@ -103,7 +122,7 @@ def wfreq(sample):
 def samples(sample):
 
     # Create variable for sample to query for
-    sample_query = "Sample." + sample
+    sample_query = "Samples." + sample
 
     # Create empty dictionary and lists to store data
     samples_info = {}
