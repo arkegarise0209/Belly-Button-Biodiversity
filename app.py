@@ -4,7 +4,7 @@ from sqlalchemy.ext.automap import automap_base
 from sqlalchemy.orm import Session
 from sqlalchemy import create_engine, desc
 from flask import Flask, jsonify, render_template
-import json
+
 # Create App
 app = Flask(__name__)
 
@@ -29,9 +29,9 @@ def contents():
     routes = [
         "/names",
         "/otu",
-        "/metadata/<sample>",
-        "/wfreq/<sample>",
-        "/samples/<sample>"
+        "/metadata/<sample> (Ex: BB_940)",
+        "/wfreq/<sample> (Ex: BB_940)",
+        "/samples/<sample> (Ex: BB_940)"
         ]
     
     return jsonify(routes)
