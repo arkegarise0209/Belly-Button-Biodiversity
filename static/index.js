@@ -100,6 +100,7 @@ function init(sample) {
                 type: "pie",
                 hovertext: pieLabels
             }];
+
             Plotly.newPlot("pie", pieData);
     
             // Plot bubble plot
@@ -119,6 +120,7 @@ function init(sample) {
                     title: "OTU ID"
                 }
             };
+            
             Plotly.newPlot("bubble", bubbleData, bubbleLayout);
         });
     });
