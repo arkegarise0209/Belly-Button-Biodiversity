@@ -93,7 +93,7 @@ def metadata(sample):
         sample_metadata["ETHNICITY"] = result.ETHNICITY
         sample_metadata["GENDER"] = result.GENDER
         sample_metadata["LOCATION"] = result.LOCATION
-        sample_metadata["samples_metadata"] = result.SAMPLEID
+        sample_metadata["SAMPLE_ID"] = result.SAMPLEID
 
         # Append dictionary to empty list
         jsonToReturn.append(sample_metadata)
